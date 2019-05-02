@@ -52,10 +52,10 @@ const parseURL = url => {
 }
 
 const isAuthorized = (referer, whitelist = []) => {
-  console.log('whitelist', whitelist)
+  // console.log('whitelist', whitelist)
   const { host, protocol } = parseURL(referer)
-  console.log('host', host)
-  console.log('protocol', protocol)
+  // console.log('host', host)
+  // console.log('protocol', protocol)
   return (
     isWhitelisted(host, whitelist) &&
     (protocol === 'https:' || (protocol === 'http:' && host === 'localhost'))
@@ -74,8 +74,7 @@ const destinationWhiteList = toRegexArray(
   process.env.PROXY_DESTINATION_WHITELIST
 )
 const proxyPrefix = process.env.PROXY_PREFIX || 'proxy'
-
-console.log('process.env.PROXY_PREFIX', process.env.PROXY_PREFIX)
+// console.log('process.env.PROXY_PREFIX', process.env.PROXY_PREFIX)
 
 const requestHeaders = headers => {
   console.log('requestHeaders, headers', headers)
@@ -92,19 +91,19 @@ const requestHeaders = headers => {
     'x-forwarded-referer': referer
   }
   const modifiedHeaders = { ...filteredHeaders, ...defaultHeaders }
-  console.log('requestHeaders, modifiedHeaders', modifiedHeaders)
+  // console.log('requestHeaders, modifiedHeaders', modifiedHeaders)
   return modifiedHeaders
 }
 
 const allowHeaders = headers => {
-  console.log('allowHeaders, headers', headers)
+  // console.log('allowHeaders, headers', headers)
   const {
     'access-control-request-headers': requestedHeaders,
     ...filteredHeaders
   } = headers
 
-  console.log('allowHeaders, requestedHeaders', requestedHeaders)
-  console.log('allowHeaders, filteredHeaders', filteredHeaders)
+  // console.log('allowHeaders, requestedHeaders', requestedHeaders)
+  // console.log('allowHeaders, filteredHeaders', filteredHeaders)
 
   const defaultAllowedHeaders = [
     'accept',
@@ -119,7 +118,7 @@ const allowHeaders = headers => {
     ...Object.keys(filteredHeaders),
     ...defaultAllowedHeaders
   ].join(',')
-  console.log('allowHeaders, allowedHeaders', allowedHeaders)
+  // console.log('allowHeaders, allowedHeaders', allowedHeaders)
   return allowedHeaders
 }
 
@@ -127,30 +126,30 @@ const json = response => {
   return response
     .text()
     .then(text => {
-      console.log('processRequest, text', text)
+      // console.log('processRequest, text', text)
       return text
     })
     .then((response = {}) => {
       const json = JSON.parse(response)
-      console.log('processRequest, json', json)
+      // console.log('processRequest, json', json)
       return json
     })
 }
 
 const processRequest = (res, origin, url, options) => {
-  console.log('url', url)
-  console.log('options', options)
+  // console.log('url', url)
+  // console.log('options', options)
   return fetch(url, options)
     .then(response => {
-      console.log('processRequest, response.status', response.status)
+      // console.log('processRequest, response.status', response.status)
       if (response.status > 299) {
         return send(res, response.status || 500, response)
       } else {
         return json(response)
           .then(data => {
-            console.log('processRequest, data', data)
+            // console.log('processRequest, data', data)
             if (origin) {
-              console.log('processRequest, origin', origin)
+              // console.log('processRequest, origin', origin)
               res.setHeader('access-control-allow-origin', origin)
             }
             return send(res, 200, data)
@@ -168,25 +167,25 @@ const processRequest = (res, origin, url, options) => {
 }
 
 const handleOptions = async (req, res) => {
-  console.log('handleOptions, req.headers', req.headers)
-  console.log('handleOptions, allowHeaders', allowHeaders(req.headers))
+  // console.log('handleOptions, req.headers', req.headers)
+  // console.log('handleOptions, allowHeaders', allowHeaders(req.headers))
   res.setHeader('access-control-allow-headers', allowHeaders(req.headers))
   return send(res, 204)
 }
 
 const handleProxy = async (req, res) => {
-  console.log('called proxy')
-  console.log('req.method', req.method)
+  // console.log('called proxy')
+  // console.log('req.method', req.method)
   if (req.method === 'OPTIONS') {
     return handleOptions(req, res)
   }
 
   try {
     const path = req.url
-    console.log('path', path)
+    // console.log('path', path)
     // console.log('req.rawHeaders',req.rawHeaders)
-    console.log('req.headers.referer', req.headers.referer)
-    console.log('req.headers.origin', req.headers.origin)
+    // console.log('req.headers.referer', req.headers.referer)
+    // console.log('req.headers.origin', req.headers.origin)
     // console.log('req.headers',req.headers)
     if (!req.headers.referer) {
       return noReferer(req, res)
@@ -195,15 +194,11 @@ const handleProxy = async (req, res) => {
       return notAuthorized(req, res)
     }
 
-    console.log('proxyPrefix', proxyPrefix)
-    console.log(
-      "path.replace(`/${proxyPrefix}/`,'')",
-      path.replace(`/${proxyPrefix}/`, '')
-    )
+    // console.log('proxyPrefix', proxyPrefix)
     const destinationURL = decodeURIComponent(
       path.replace(`/${proxyPrefix}/`, '')
     )
-    console.log('destinationURL', destinationURL)
+    // console.log('destinationURL', destinationURL)
 
     if (!isAuthorized(destinationURL, destinationWhiteList)) {
       return notAuthorized(req, res)
@@ -216,14 +211,14 @@ const handleProxy = async (req, res) => {
 
     if (req.method !== 'GET') {
       const txt = await text(req)
-      console.log('txt', txt)
+      // console.log('txt', txt)
       if (txt) {
         const body = JSON.parse(txt)
-        console.log('body', body)
+        // console.log('body', body)
         if (body) {
           fetchOptions.body = JSON.stringify(body)
         }
-        console.log('body fetchOptions', fetchOptions)
+        // console.log('body fetchOptions', fetchOptions)
       }
     }
     return processRequest(res, req.headers.origin, destinationURL, fetchOptions)
