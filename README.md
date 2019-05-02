@@ -48,7 +48,7 @@ Once your server is up and running, you can send `GET`, `DELETE`, `OPTIONS`, `PA
 Sample call using [jQuery.get()](https://api.jquery.com/jquery.get/) below:
 
 ```js
-const sampleEndpoint = `https://12345678.ngrok.io//proxy/${encodeURIComponent(
+const sampleEndpoint = `https://12345678.ngrok.io/proxy/${encodeURIComponent(
   'https://23456789.myshopify.com/admin/customers.json'
 )}`
 
