@@ -1,0 +1,17 @@
+{
+  "name": "demo-micro-cors-http-proxy",
+  "alias": "particular-demo-micro-cors-http-proxy.now.sh",
+  "env": {
+    "NODE_ENV": "production",
+    "PROXY_PREFIX": "@demo-proxy-prefix",
+    "PROXY_REFERER_WHITELIST": "@demo-proxy-referer-whitelist",
+    "PROXY_DESTINATION_WHITELIST": "@demo-proxy-destination-whitelist"
+  },
+  "routes": [{ "src": "/(.*)", "dest": "/src" }],
+  "builds": [
+    {
+      "src": "src/*.js",
+      "use": "@now/node"
+    }
+  ]
+}

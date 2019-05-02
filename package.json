@@ -1,0 +1,54 @@
+{
+  "name": "@particular./micro-cors-http-proxy",
+  "version": "0.0.0-semantic-release",
+  "author": "Adam Grohs <info@uniquelyparticular.com> (https://uniquelyparticular.com)",
+  "owner": "Particular.",
+  "description": "Please contact Particular. via info@uniquelyparticular.com for any questions",
+  "keywords": [
+    "zeit",
+    "micro",
+    "cors",
+    "proxy",
+    "http",
+    "microservices",
+    "particular",
+    "particular."
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/uniquelyparticular/micro-cors-http-proxy#readme",
+  "repository": "github:uniquelyparticular/micro-cors-http-proxy",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "micro-dev",
+    "precommit": "pretty-quick --staged",
+    "start": "micro",
+    "clean-install": "yarn install --force",
+    "test": "jest --passWithNoTests",
+    "semantic-release": "semantic-release"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "dependencies": {
+    "micro": "^9.3.3",
+    "micro-cors": "^0.1.1",
+    "microrouter": "^3.1.3",
+    "node-fetch": "^2.3.0",
+    "url-pattern": "^1.0.3",
+    "whatwg-url": "^7.0.0"
+  },
+  "devDependencies": {
+    "husky": "2.1.0",
+    "jest": "24.7.1",
+    "micro-dev": "3.0.0",
+    "prettier": "1.17.0",
+    "pretty-quick": "1.10.0",
+    "semantic-release": "15.13.12",
+    "ts-jest": "24.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

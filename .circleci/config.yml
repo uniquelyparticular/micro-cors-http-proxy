@@ -1,0 +1,47 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: 'circleci/node:lts'
+    steps:
+      - checkout
+      - run: yarn clean-install
+      - save_cache:
+          paths:
+            - node_modules
+          key: micro-cors-http-proxy-{{ checksum "package.json" }}
+  test:
+    docker:
+      - image: 'circleci/node:lts'
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - micro-cors-http-proxy-{{ checksum "package.json" }}
+      - run: yarn clean-install
+      - run: yarn test
+  release:
+    docker:
+      - image: 'circleci/node:lts'
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - micro-cors-http-proxy-{{ checksum "package.json" }}
+      - run: yarn clean-install
+      - run: npx semantic-release
+workflows:
+  version: 2
+  build_test_release:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - release:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - test
