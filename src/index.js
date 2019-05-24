@@ -53,10 +53,10 @@ const parseURL = url => {
 }
 
 const isAuthorized = (referer, whitelist = []) => {
-  console.log('whitelist', whitelist)
+  // console.log('whitelist', whitelist)
   const { hostname, protocol } = parseURL(referer)
-  console.log('hostname', hostname)
-  console.log('protocol', protocol)
+  // console.log('hostname', hostname)
+  // console.log('protocol', protocol)
   return (
     isWhitelisted(hostname, whitelist) &&
     (protocol === 'https:' ||
