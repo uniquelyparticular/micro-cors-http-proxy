@@ -5,6 +5,7 @@ const { URL } = require('whatwg-url')
 const UrlPattern = require('url-pattern')
 const cors = require('micro-cors')()
 const fetch = require('node-fetch')
+const { filterByPrefix, mustachReplace } = require('./utils')
 
 const _toJSON = error => {
   return !error
@@ -74,24 +75,39 @@ const destinationWhiteList = toRegexArray(
   process.env.PROXY_DESTINATION_WHITELIST
 )
 const proxyPrefix = process.env.PROXY_PREFIX || 'proxy'
-// console.log('process.env.PROXY_PREFIX', process.env.PROXY_PREFIX)
+const proxyReplacePrefix = process.env.PROXY_REPLACE || 'PROXY_REPLACE_'
+const proxyReplaceMatchPrefix = process.env.PROXY_REPLACE_MATCH || 'setting'
+// console.log('process.env.PROXY_PREFIX', proxyPrefix)
+// console.log('process.env.PROXY_REPLACE', proxyReplacePrefix)
+// console.log('process.env.PROXY_REPLACE_MATCH', proxyReplaceMatchPrefix)
+const envReplacements = filterByPrefix(process.env, proxyReplacePrefix)
+console.log('envReplacements', envReplacements)
+
+const filterValue = input => {
+  return mustachReplace(input, envReplacements, proxyReplaceMatchPrefix)
+}
 
 const requestHeaders = headers => {
-  console.log('requestHeaders, headers', headers)
   const {
     host,
     referer,
     origin,
     'x-requested-with': requestedWith,
-    ...filteredHeaders
+    ...filteringHeaders
   } = headers
+
+  const filteredHeaders = Object.keys(filteringHeaders).reduce((obj, key) => {
+    obj[key] = filterValue(filteringHeaders[key])
+    return obj
+  }, {})
+
   const defaultHeaders = {
     'x-forwarded-by': `${name}-${version}`,
     'x-forwarded-origin': origin,
     'x-forwarded-referer': referer
   }
   const modifiedHeaders = { ...filteredHeaders, ...defaultHeaders }
-  // console.log('requestHeaders, modifiedHeaders', modifiedHeaders)
+  console.log('requestHeaders, modifiedHeaders', modifiedHeaders)
   return modifiedHeaders
 }
 
