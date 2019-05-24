@@ -81,7 +81,7 @@ const proxyReplaceMatchPrefix = process.env.PROXY_REPLACE_MATCH || 'setting'
 // console.log('process.env.PROXY_REPLACE', proxyReplacePrefix)
 // console.log('process.env.PROXY_REPLACE_MATCH', proxyReplaceMatchPrefix)
 const envReplacements = filterByPrefix(process.env, proxyReplacePrefix)
-console.log('envReplacements', envReplacements)
+// console.log('envReplacements', envReplacements)
 
 const filterValue = input => {
   return mustachReplace(input, envReplacements, proxyReplaceMatchPrefix)
