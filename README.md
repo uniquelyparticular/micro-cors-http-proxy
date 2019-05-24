@@ -11,17 +11,50 @@ Built with [Micro](https://github.com/zeit/micro)! 🤩
 Create a `.env` at the project root with the following credentials:
 
 ```dosini
-PROXY_PREFIX=proxy
 PROXY_REFERER_WHITELIST=localhost,*.zendesk.com,*.myshopify.com,*.now.sh
 PROXY_DESTINATION_WHITELIST=api.stripe.com,api.goshippo.com,api.shipengine.com,api.moltin.com,*.myshopify.com,*.salesforce.com,*.demandware.net
 ```
-
-`PROXY_PREFIX` is optional and will default to `'proxy'` but is used in the URI patterns to determine where to find the encoded uri to proxy request to (ie. `https://12345678.ngrok.io/<<<PROXY_PREFIX>>>/https%3A%2F%2Fapi.somethingsecure.com%2Fadmin%2Fcustomers.json`)
 
 `PROXY_REFERER_WHITELIST` is a comma separated list of patterns to match against the incoming requests 'Referer' header (ex. `localhost,*.myawesomesite.com,*.now.sh`)
 _(and yes, 'REFERER' is intentionally misspelled to match the http header! 😉)_
 
 `PROXY_DESTINATION_WHITELIST` is a comma separated list of patterns to match against the URI you are proxying requests to. (ex. `api.somethingsecure.com,*.somotherapi.com`)
+
+_Optional Additional Parameters_
+const proxyReplacePrefix = process.env.PROXY*REPLACE || 'PROXY_REPLACE*'
+const proxyReplaceMatchPrefix = process.env.PROXY_REPLACE_MATCH || 'setting'
+
+```dosini
+PROXY_PREFIX=proxy
+PROXY_REPLACE_MATCH=setting
+PROXY_REPLACE=PROXY_REPLACE_
+```
+
+`PROXY_PREFIX` will default to `'proxy'` and is used in the URI patterns to determine where to find the encoded uri to proxy request to (ie. `https://12345678.ngrok.io/<<<PROXY_PREFIX>>>/https%3A%2F%2Fapi.somethingsecure.com%2Fadmin%2Fcustomers.json`)
+
+`PROXY_REPLACE_MATCH` will default to `'setting'` and used within HTTP_HEADERS sent to the proxy to support Mustache like syntax `{{<<PROXY_REPLACE_MATCH>>.something_secure}}` to replace `something_secure` with a value found in your `process.env` (preceeded by your `PROXY_REPLACE` prefix)
+
+`PROXY_REPLACE` will default to `'PROXY_REPLACE_'` and is the prefix used to look for other keys in your `process.env` that it will then use to override matched HTTP_HEADER values with
+
+_Example_
+
+```dosini
+PROXY_REPLACE_MATCH=setting
+PROXY_REPLACE=PROXY_REPLACE_
+PROXY_REPLACE_SOMETHING_SECURE=1XXXXXxxxxxXXXXXxxxxxXXXXXxxxxx1
+```
+
+Which will then take something like the following HTTP_HEADER sent to the proxy:
+
+```dosini
+{ 'X-Shopify-Access-Token', '{{setting.something_secure}}' }
+```
+
+And before the request is proxied to the destination will inject your `process.env` value to send along in the proxied request:
+
+```dosini
+{ 'X-Shopify-Access-Token', '1XXXXXxxxxxXXXXXxxxxxXXXXXxxxxx1' }
+```
 
 ## 📦 Package
 

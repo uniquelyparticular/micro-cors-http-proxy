@@ -5,7 +5,9 @@
     "NODE_ENV": "production",
     "PROXY_PREFIX": "@demo-proxy-prefix",
     "PROXY_REFERER_WHITELIST": "@demo-proxy-referer-whitelist",
-    "PROXY_DESTINATION_WHITELIST": "@demo-proxy-destination-whitelist"
+    "PROXY_DESTINATION_WHITELIST": "@demo-proxy-destination-whitelist",
+    "PROXY_REPLACE_GATEWAY_PK": "@particular-gateway-pk",
+    "PROXY_REPLACE_GATEWAY_SK": "@particular-gateway-sk"
   },
   "routes": [{ "src": "/(.*)", "dest": "/src" }],
   "builds": [
