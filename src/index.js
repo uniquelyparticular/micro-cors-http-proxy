@@ -5,7 +5,7 @@ const { URL } = require('whatwg-url')
 const UrlPattern = require('url-pattern')
 const cors = require('micro-cors')()
 const fetch = require('node-fetch')
-const { filterByPrefix, mustachReplace } = require('./utils')
+const { filterByPrefix, mustachReplace } = require('./utils/tokenization')
 
 const _toJSON = error => {
   return !error
@@ -48,18 +48,19 @@ const isWhitelisted = (host, hostMap) => {
 }
 
 const parseURL = url => {
-  const { host, protocol } = new URL(url)
-  return { host, protocol }
+  const { hostname, protocol } = new URL(url)
+  return { hostname, protocol }
 }
 
 const isAuthorized = (referer, whitelist = []) => {
-  // console.log('whitelist', whitelist)
-  const { host, protocol } = parseURL(referer)
-  // console.log('host', host)
-  // console.log('protocol', protocol)
+  console.log('whitelist', whitelist)
+  const { hostname, protocol } = parseURL(referer)
+  console.log('hostname', hostname)
+  console.log('protocol', protocol)
   return (
-    isWhitelisted(host, whitelist) &&
-    (protocol === 'https:' || (protocol === 'http:' && host === 'localhost'))
+    isWhitelisted(hostname, whitelist) &&
+    (protocol === 'https:' ||
+      (protocol === 'http:' && hostname === 'localhost'))
   )
 }
 
