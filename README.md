@@ -88,7 +88,7 @@ const sampleEndpoint = `https://12345678.ngrok.io/proxy/${encodeURIComponent(
 $.ajax({
   url: sampleEndpoint,
   type: 'GET',
-  corse: true,
+  cors: true,
   beforeSend: xhr => {
     xhr.setRequestHeader(
       'X-Shopify-Access-Token',
