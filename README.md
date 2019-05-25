@@ -11,12 +11,11 @@ Built with [Micro](https://github.com/zeit/micro)! 🤩
 Create a `.env` at the project root with the following credentials:
 
 ```dosini
-PROXY_REFERER_WHITELIST=localhost,*.zendesk.com,*.myshopify.com,*.now.sh
+PROXY_ORIGIN_WHITELIST=localhost,*.zendesk.com,*.myshopify.com,*.now.sh
 PROXY_DESTINATION_WHITELIST=api.stripe.com,api.goshippo.com,api.shipengine.com,api.moltin.com,*.myshopify.com,*.salesforce.com,*.demandware.net
 ```
 
-`PROXY_REFERER_WHITELIST` is a comma separated list of patterns to match against the incoming requests 'Referer' header (ex. `localhost,*.myawesomesite.com,*.now.sh`)
-_(and yes, 'REFERER' is intentionally misspelled to match the http header! 😉)_
+`PROXY_ORIGIN_WHITELIST` is a comma separated list of patterns to match against the incoming requests 'Origin' header (ex. `localhost,*.myawesomesite.com,*.now.sh`)
 
 `PROXY_DESTINATION_WHITELIST` is a comma separated list of patterns to match against the URI you are proxying requests to. (ex. `api.somethingsecure.com,*.somotherapi.com`)
 
