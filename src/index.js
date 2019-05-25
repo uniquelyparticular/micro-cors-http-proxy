@@ -53,15 +53,11 @@ const parseURL = url => {
 }
 
 const isAuthorized = (referer, whitelist = []) => {
+  // console.log('referer', referer)
   // console.log('whitelist', whitelist)
-  const { hostname, protocol } = parseURL(referer)
+  const { hostname } = parseURL(referer)
   // console.log('hostname', hostname)
-  // console.log('protocol', protocol)
-  return (
-    isWhitelisted(hostname, whitelist) &&
-    (protocol === 'https:' ||
-      (protocol === 'http:' && hostname === 'localhost'))
-  )
+  return isWhitelisted(hostname, whitelist)
 }
 
 const toRegexArray = csv => {
@@ -71,7 +67,7 @@ const toRegexArray = csv => {
     .map(value => new RegExp(`^${prepareRegex(value)}$`))
 }
 
-const refererWhiteList = toRegexArray(process.env.PROXY_REFERER_WHITELIST)
+const originWhiteList = toRegexArray(process.env.PROXY_ORIGIN_WHITELIST)
 const destinationWhiteList = toRegexArray(
   process.env.PROXY_DESTINATION_WHITELIST
 )
@@ -86,6 +82,16 @@ const envReplacements = filterByPrefix(process.env, proxyReplacePrefix)
 
 const filterValue = input => {
   return mustachReplace(input, envReplacements, proxyReplaceMatchPrefix)
+}
+
+const getOrigin = (origin, referer) => {
+  // console.log('getOrigin, origin', origin)
+  // console.log('getOrigin, referer', referer)
+  const subOrigin = referer.match(/\?origin=([^\?&]+)/)
+  if (subOrigin) {
+    origin = decodeURIComponent(subOrigin[1])
+  }
+  return origin
 }
 
 const requestHeaders = headers => {
@@ -104,11 +110,11 @@ const requestHeaders = headers => {
 
   const defaultHeaders = {
     'x-forwarded-by': `${name}-${version}`,
-    'x-forwarded-origin': origin,
+    'x-forwarded-origin': getOrigin(origin, referer),
     'x-forwarded-referer': referer
   }
   const modifiedHeaders = { ...filteredHeaders, ...defaultHeaders }
-  console.log('requestHeaders, modifiedHeaders', modifiedHeaders)
+  // console.log('requestHeaders, modifiedHeaders', modifiedHeaders)
   return modifiedHeaders
 }
 
@@ -207,7 +213,13 @@ const handleProxy = async (req, res) => {
     if (!req.headers.referer) {
       return noReferer(req, res)
     }
-    if (!isAuthorized(req.headers.referer, refererWhiteList)) {
+
+    if (
+      !isAuthorized(
+        getOrigin(req.headers.origin, req.headers.referer),
+        originWhiteList
+      )
+    ) {
       return notAuthorized(req, res)
     }
 
@@ -229,15 +241,23 @@ const handleProxy = async (req, res) => {
     if (req.method !== 'GET') {
       const txt = await text(req)
       // console.log('txt', txt)
-      if (txt) {
-        const body = JSON.parse(txt)
+      if (txt && txt !== '') {
+        let body
+
+        if (req.headers['content-type'] === 'application/json') {
+          body = JSON.parse(txt)
+        } else {
+          body = txt
+        }
+
         // console.log('body', body)
         if (body) {
-          fetchOptions.body = JSON.stringify(body)
+          fetchOptions.body = body
         }
-        // console.log('body fetchOptions', fetchOptions)
+        // console.log('fetchOptions.body', fetchOptions.body)
       }
     }
+    // console.log('fetchOptions', fetchOptions)
     return processRequest(res, req.headers.origin, destinationURL, fetchOptions)
   } catch (error) {
     const jsonError = _toJSON(error)
