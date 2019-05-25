@@ -108,7 +108,6 @@ const requestHeaders = headers => {
     'x-forwarded-referer': referer
   }
   const modifiedHeaders = { ...filteredHeaders, ...defaultHeaders }
-  console.log('requestHeaders, modifiedHeaders', modifiedHeaders)
   return modifiedHeaders
 }
 
@@ -229,15 +228,23 @@ const handleProxy = async (req, res) => {
     if (req.method !== 'GET') {
       const txt = await text(req)
       // console.log('txt', txt)
-      if (txt) {
-        const body = JSON.parse(txt)
+      if (txt && txt !== '') {
+        let body
+
+        if (req.headers['content-type'] === 'application/json') {
+          body = JSON.parse(txt)
+        } else {
+          body = txt
+        }
+
         // console.log('body', body)
         if (body) {
-          fetchOptions.body = JSON.stringify(body)
+          fetchOptions.body = body
         }
-        // console.log('body fetchOptions', fetchOptions)
+        // console.log('fetchOptions.body', fetchOptions.body)
       }
     }
+    // console.log('fetchOptions', fetchOptions)
     return processRequest(res, req.headers.origin, destinationURL, fetchOptions)
   } catch (error) {
     const jsonError = _toJSON(error)
