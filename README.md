@@ -11,8 +11,8 @@ Built with [Micro](https://github.com/zeit/micro)! 🤩
 Create a `.env` at the project root with the following credentials:
 
 ```dosini
-PROXY_ORIGIN_WHITELIST=localhost,*.zendesk.com,*.myshopify.com,*.now.sh
-PROXY_DESTINATION_WHITELIST=api.stripe.com,api.goshippo.com,api.shipengine.com,api.moltin.com,*.myshopify.com,*.salesforce.com,*.demandware.net
+PROXY_ORIGIN_WHITELIST=*.mysite.com,*.mycrmplaform.io,*.mycommerceplaform.com,*.now.sh
+PROXY_DESTINATION_WHITELIST=api.mygateway.com,api.myshippingplatform.com,api.mycommerceplaform.com,*.whatever.net
 ```
 
 `PROXY_ORIGIN_WHITELIST` is a comma separated list of patterns to match against the incoming requests 'Origin' header (ex. `localhost,*.myawesomesite.com,*.now.sh`)
@@ -91,7 +91,7 @@ $.ajax({
   beforeSend: xhr => {
     xhr.setRequestHeader(
       'X-Shopify-Access-Token',
-      '1XXXXXxxxxxXXXXXxxxxxXXXXXxxxxx1'
+      '{{setting.something_secure}}'
     )
   }
 })
