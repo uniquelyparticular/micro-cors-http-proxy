@@ -91,7 +91,7 @@ const getOrigin = (origin, referer) => {
   if (subOrigin) {
     origin = decodeURIComponent(subOrigin[1])
   }
-  return origin
+  return origin || referer
 }
 
 const requestHeaders = headers => {
@@ -100,11 +100,11 @@ const requestHeaders = headers => {
     referer,
     origin,
     'x-requested-with': requestedWith,
-    ...filteringHeaders
+    ...filterableHeaderss
   } = headers
 
-  const filteredHeaders = Object.keys(filteringHeaders).reduce((obj, key) => {
-    obj[key] = filterValue(filteringHeaders[key])
+  const filteredHeaders = Object.keys(filterableHeaderss).reduce((obj, key) => {
+    obj[key] = filterValue(filterableHeaderss[key])
     return obj
   }, {})
 
@@ -113,6 +113,7 @@ const requestHeaders = headers => {
     'x-forwarded-origin': getOrigin(origin, referer),
     'x-forwarded-referer': referer
   }
+
   const modifiedHeaders = { ...filteredHeaders, ...defaultHeaders }
   // console.log('requestHeaders, modifiedHeaders', modifiedHeaders)
   return modifiedHeaders
@@ -164,9 +165,17 @@ const processRequest = (res, origin, url, options) => {
   // console.log('options', options)
   return fetch(url, options)
     .then(response => {
-      // console.log('processRequest, response.status', response.status)
+      // console.log('processRequest, response', response)
       if (response.status > 299) {
-        return send(res, response.status || 500, response)
+        // console.log('processRequest, response.statusText', response.statusText)
+        const errorResponse = {
+          ...response,
+          url: url,
+          options: JSON.stringify(options),
+          status: response.status,
+          statusText: response.statusText
+        }
+        return send(res, response.status || 500, errorResponse)
       } else {
         return json(response)
           .then(data => {
@@ -225,9 +234,8 @@ const handleProxy = async (req, res) => {
 
     // console.log('proxyPrefix', proxyPrefix)
     const destinationURL = decodeURIComponent(
-      path.replace(`/${proxyPrefix}/`, '')
+      decodeURIComponent(path.replace(`/${proxyPrefix}/`, ''))
     )
-    // console.log('destinationURL', destinationURL)
 
     if (!isAuthorized(destinationURL, destinationWhiteList)) {
       return notAuthorized(req, res)
