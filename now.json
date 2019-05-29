@@ -1,6 +1,7 @@
 {
+  "version": 2,
   "name": "demo-micro-cors-http-proxy",
-  "alias": "particular-demo-micro-cors-http-proxy.now.sh",
+  "alias": "particular-micro-cors-http-proxy.now.sh",
   "env": {
     "NODE_ENV": "production",
     "PROXY_PREFIX": "@demo-proxy-prefix",
