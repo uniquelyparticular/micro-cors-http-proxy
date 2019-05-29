@@ -169,11 +169,13 @@ const processRequest = (res, origin, url, options) => {
       if (response.status > 299) {
         // console.log('processRequest, response.statusText', response.statusText)
         const errorResponse = {
-          ...response,
-          url: url,
-          options: JSON.stringify(options),
           status: response.status,
-          statusText: response.statusText
+          statusText: response.statusText,
+          ...response,
+          request: {
+            url,
+            options: JSON.stringify(options)
+          }
         }
         return send(res, response.status || 500, errorResponse)
       } else {
