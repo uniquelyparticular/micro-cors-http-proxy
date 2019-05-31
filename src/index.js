@@ -43,6 +43,7 @@ const prepareRegex = string => {
     .replace(/[-[\]{}()*+!<=:?.\/\\^$|#\s,]/g, '\\$&')
     .replace('\\*', '.+')
 }
+
 const isWhitelisted = (host, hostMap) => {
   return hostMap.some(entry => entry.test(host))
 }
@@ -53,11 +54,12 @@ const parseURL = url => {
 }
 
 const isAuthorized = (referer, whitelist = []) => {
-  // console.log('referer', referer)
-  // console.log('whitelist', whitelist)
-  const { hostname } = parseURL(referer)
-  // console.log('hostname', hostname)
-  return isWhitelisted(hostname, whitelist)
+  if (referer) {
+    const { hostname } = parseURL(referer)
+    return isWhitelisted(hostname, whitelist)
+  } else {
+    return false
+  }
 }
 
 const toRegexArray = csv => {
@@ -87,7 +89,7 @@ const filterValue = input => {
 const getOrigin = (origin, referer) => {
   // console.log('getOrigin, origin', origin)
   // console.log('getOrigin, referer', referer)
-  const subOrigin = referer.match(/\?origin=([^\?&]+)/)
+  const subOrigin = referer ? referer.match(/\?origin=([^\?&]+)/) : null
   if (subOrigin) {
     origin = decodeURIComponent(subOrigin[1])
   }
