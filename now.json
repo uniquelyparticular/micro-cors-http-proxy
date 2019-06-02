@@ -7,7 +7,6 @@
     "PROXY_PREFIX": "@demo-proxy-prefix",
     "PROXY_ORIGIN_WHITELIST": "@demo-proxy-origin-whitelist",
     "PROXY_DESTINATION_WHITELIST": "@demo-proxy-destination-whitelist",
-    "PROXY_REPLACE_GATEWAY_PK": "@particular-gateway-pk",
     "PROXY_REPLACE_GATEWAY_SK": "@particular-gateway-sk"
   },
   "routes": [{ "src": "/(.*)", "dest": "/src" }],
