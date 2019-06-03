@@ -1,5 +1,5 @@
 const { name, version } = require('../package.json')
-const { text, send } = require('micro')
+const { text, json, send } = require('micro')
 const { router, del, get, options, patch, post, put } = require('microrouter')
 const { URL } = require('whatwg-url')
 const UrlPattern = require('url-pattern')
@@ -111,8 +111,9 @@ const requestHeaders = headers => {
   }, {})
 
   const defaultHeaders = {
+    origin: getOrigin(origin, referer),
     'x-forwarded-by': `${name}-${version}`,
-    'x-forwarded-origin': getOrigin(origin, referer),
+    'x-forwarded-origin': origin,
     'x-forwarded-referer': referer
   }
 
@@ -148,7 +149,7 @@ const allowHeaders = headers => {
   return allowedHeaders
 }
 
-const json = response => {
+const handleResponse = response => {
   return response
     .text()
     .then(text => {
@@ -156,9 +157,9 @@ const json = response => {
       return text
     })
     .then((response = {}) => {
-      const json = JSON.parse(response)
-      // console.log('processRequest, json', json)
-      return json
+      const jsonResponse = JSON.parse(response)
+      // console.log('processRequest, jsonResponse', jsonResponse)
+      return jsonResponse
     })
 }
 
@@ -181,7 +182,7 @@ const processRequest = (res, origin, url, options) => {
         }
         return send(res, response.status || 500, errorResponse)
       } else {
-        return json(response)
+        return handleResponse(response)
           .then(data => {
             // console.log('processRequest, data', data)
             if (origin) {
@@ -251,23 +252,16 @@ const handleProxy = async (req, res) => {
     }
 
     if (req.method !== 'GET') {
-      const txt = await text(req)
+      const body =
+        req.headers['content-type'] === 'application/json'
+          ? JSON.stringify((await json(req)) || {})
+          : await text(req)
       // console.log('txt', txt)
-      if (txt && txt !== '') {
-        let body
 
-        if (req.headers['content-type'] === 'application/json') {
-          body = JSON.parse(txt)
-        } else {
-          body = txt
-        }
-
-        // console.log('body', body)
-        if (body) {
-          fetchOptions.body = body
-        }
-        // console.log('fetchOptions.body', fetchOptions.body)
+      if (body) {
+        fetchOptions.body = body
       }
+      // console.log('fetchOptions.body', fetchOptions.body)
     }
     // console.log('fetchOptions', fetchOptions)
     return processRequest(res, req.headers.origin, destinationURL, fetchOptions)
