@@ -4,9 +4,9 @@
   "alias": "particular-micro-cors-http-proxy.now.sh",
   "env": {
     "NODE_ENV": "production",
-    "PROXY_PREFIX": "@demo-proxy-prefix",
-    "PROXY_ORIGIN_WHITELIST": "@demo-proxy-origin-whitelist",
-    "PROXY_DESTINATION_WHITELIST": "@demo-proxy-destination-whitelist",
+    "PROXY_PREFIX": "@particular-proxy-prefix",
+    "PROXY_ORIGIN_WHITELIST": "@particular-proxy-origin-whitelist",
+    "PROXY_DESTINATION_WHITELIST": "@particular-proxy-destination-whitelist",
     "PROXY_REPLACE_GATEWAY_SK": "@particular-gateway-sk"
   },
   "routes": [{ "src": "/(.*)", "dest": "/src" }],
