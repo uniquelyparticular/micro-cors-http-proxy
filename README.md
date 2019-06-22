@@ -2,6 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@particular./micro-cors-http-proxy.svg)](https://www.npmjs.com/package/@particular./micro-cors-http-proxy) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier) [![CircleCI](https://img.shields.io/circleci/project/github/uniquelyparticular/micro-cors-http-proxy.svg?label=circleci)](https://circleci.com/gh/uniquelyparticular/micro-cors-http-proxy)
 ![dependency status: david](https://img.shields.io/david/uniquelyparticular/micro-cors-http-proxy.svg)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Funiquelyparticular%2Fmicro-cors-http-proxy.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Funiquelyparticular%2Fmicro-cors-http-proxy?ref=badge_shield)
 
 > 🎮 Minimal HTTP Proxy implementation to support secure whitelisting and CORS
 
@@ -105,3 +106,7 @@ $.ajax({
 You can easily deploy this function to [now](https://now.sh).
 
 _Contact [Adam Grohs](https://www.linkedin.com/in/adamgrohs/) @ [Particular.](https://uniquelyparticular.com) for any questions._
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Funiquelyparticular%2Fmicro-cors-http-proxy.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Funiquelyparticular%2Fmicro-cors-http-proxy?ref=badge_large)
