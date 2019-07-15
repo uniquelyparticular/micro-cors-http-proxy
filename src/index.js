@@ -102,11 +102,11 @@ const requestHeaders = headers => {
     referer,
     origin,
     'x-requested-with': requestedWith,
-    ...filterableHeaderss
+    ...filterableHeaders
   } = headers
 
-  const filteredHeaders = Object.keys(filterableHeaderss).reduce((obj, key) => {
-    obj[key] = filterValue(filterableHeaderss[key])
+  const filteredHeaders = Object.keys(filterableHeaders).reduce((obj, key) => {
+    obj[key] = filterValue(filterableHeaders[key])
     return obj
   }, {})
 
