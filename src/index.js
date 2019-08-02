@@ -5,14 +5,16 @@ const { URL } = require('whatwg-url')
 const UrlPattern = require('url-pattern')
 const cors = require('micro-cors')()
 const fetch = require('node-fetch')
-const { filterByPrefix, mustachReplace } = require('./utils/tokenization')
+const { filterByPrefix, mustachReplace, safeParse } = require('./utils')
 
-const _toJSON = error => {
-  return !error
-    ? ''
-    : Object.getOwnPropertyNames(error).reduce(
+const _toJSON = errorObj => {
+  return !errorObj
+    ? {}
+    : typeof errorObj === 'string'
+    ? errorObj
+    : Object.getOwnPropertyNames(errorObj).reduce(
         (jsonError, key) => {
-          return { ...jsonError, [key]: error[key] }
+          return { ...jsonError, [key]: errorObj[key] }
         },
         { type: 'error' }
       )
@@ -157,15 +159,15 @@ const handleResponse = response => {
       return text
     })
     .then((response = {}) => {
-      const jsonResponse = JSON.parse(response)
+      const jsonResponse = safeParse(response)
       // console.log('processRequest, jsonResponse', jsonResponse)
       return jsonResponse
     })
 }
 
 const processRequest = (res, origin, url, options) => {
-  // console.log('url', url)
-  // console.log('options', options)
+  // console.log('processRequest, url', url)
+  // console.log('processRequest, options', options)
   return fetch(url, options)
     .then(response => {
       // console.log('processRequest, response', response)
@@ -192,14 +194,14 @@ const processRequest = (res, origin, url, options) => {
             return send(res, 200, data)
           })
           .catch(error => {
-            const jsonError = _toJSON(error)
-            return send(res, error.statusCode || 500, jsonError)
+            console.error('processRequest, handleResponse, error', error)
+            return send(res, error.statusCode || 500, _toJSON(error))
           })
       }
     })
     .catch(error => {
-      const jsonError = _toJSON(error)
-      return send(res, error.statusCode || 500, jsonError)
+      console.error('processRequest, error', error)
+      return send(res, error.statusCode || 500, _toJSON(error))
     })
 }
 
@@ -211,19 +213,18 @@ const handleOptions = async (req, res) => {
 }
 
 const handleProxy = async (req, res) => {
-  // console.log('called proxy')
-  // console.log('req.method', req.method)
+  // console.log('handleProxy, req.method', req.method)
   if (req.method === 'OPTIONS') {
     return handleOptions(req, res)
   }
 
   try {
     const path = req.url
-    // console.log('path', path)
-    // console.log('req.rawHeaders',req.rawHeaders)
-    // console.log('req.headers.referer', req.headers.referer)
-    // console.log('req.headers.origin', req.headers.origin)
-    // console.log('req.headers',req.headers)
+    // console.log('handleProxy,path', path)
+    // console.log('handleProxy,req.rawHeaders',req.rawHeaders)
+    // console.log('handleProxy,req.headers.referer', req.headers.referer)
+    // console.log('handleProxy,req.headers.origin', req.headers.origin)
+    // console.log('handleProxy,req.headers',req.headers)
     if (!req.headers.referer) {
       return noReferer(req, res)
     }
@@ -237,7 +238,7 @@ const handleProxy = async (req, res) => {
       return notAuthorized(req, res)
     }
 
-    // console.log('proxyPrefix', proxyPrefix)
+    // console.log('handleProxy,proxyPrefix', proxyPrefix)
     const destinationURL = decodeURIComponent(
       decodeURIComponent(path.replace(`/${proxyPrefix}/`, ''))
     )
@@ -256,18 +257,18 @@ const handleProxy = async (req, res) => {
         req.headers['content-type'] === 'application/json'
           ? JSON.stringify((await json(req)) || {})
           : await text(req)
-      // console.log('txt', txt)
+      // console.log('handleProxy,txt', txt)
 
       if (body) {
         fetchOptions.body = body
       }
-      // console.log('fetchOptions.body', fetchOptions.body)
+      // console.log('handleProxy,fetchOptions.body', fetchOptions.body)
     }
-    // console.log('fetchOptions', fetchOptions)
+    // console.log('handleProxy,fetchOptions', fetchOptions)
     return processRequest(res, req.headers.origin, destinationURL, fetchOptions)
   } catch (error) {
-    const jsonError = _toJSON(error)
-    return send(res, error.statusCode || 500, jsonError)
+    console.error('handleProxy, error', error)
+    return send(res, error.statusCode || 500, _toJSON(error))
   }
 }
 
