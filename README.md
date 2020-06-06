@@ -16,7 +16,7 @@ PROXY_ORIGIN_WHITELIST=*.mysite.com,*.mycrmplaform.io,*.mycommerceplaform.com,*.
 PROXY_DESTINATION_WHITELIST=api.mygateway.com,api.myshippingplatform.com,api.mycommerceplaform.com,*.whatever.net
 ```
 
-`PROXY_ORIGIN_WHITELIST` is a comma separated list of patterns to match against the incoming requests 'Origin' header (ex. `localhost,*.myawesomesite.com,*.now.sh`)
+`PROXY_ORIGIN_WHITELIST` is a comma separated list of patterns to match against the incoming requests 'Referer' header (ex. `localhost,*.myawesomesite.com,*.now.sh`)
 
 `PROXY_DESTINATION_WHITELIST` is a comma separated list of patterns to match against the URI you are proxying requests to. (ex. `api.somethingsecure.com,*.somotherapi.com`)
 
