@@ -45,7 +45,7 @@
     "micro-dev": "3.0.0",
     "prettier": "1.18.2",
     "pretty-quick": "1.11.0",
-    "semantic-release": "15.13.15",
+    "semantic-release": "17.2.3",
     "ts-jest": "24.0.2"
   },
   "publishConfig": {
